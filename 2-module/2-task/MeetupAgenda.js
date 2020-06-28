@@ -1,5 +1,4 @@
 import { MeetupAgendaItem } from './MeetupAgendaItem.js';
-import { agendaItemIcons, agendaItemTitles } from './data.js';
 
 export const MeetupAgenda = {
   name: 'MeetupAgenda',
@@ -8,7 +7,7 @@ export const MeetupAgenda = {
     <p class="meetup-agenda__empty" 
       v-if="!agenda || !agenda.length" >Программа пока пуста, но когда-нибудь в ней обязательно что-нибудь появится!</p>
     <template v-else>
-      <meetup-agenda-item v-for="item in agendaList" :key="item.id" :agenda-item="item"></meetup-agenda-item>
+      <meetup-agenda-item v-for="item in agenda" :key="item.id" :agenda-item="item"></meetup-agenda-item>
     </template>
   </div>`,
 
@@ -20,16 +19,6 @@ export const MeetupAgenda = {
     agenda: {
       type: Array,
       default: () => []
-    }
-  },
-
-  computed: {
-    agendaList() {
-      return this.agenda?.map((item) => ({
-        ...item,
-        iconUrl: `/assets/icons/icon-${agendaItemIcons[item.type]}.svg`,
-        complexTitle: item.title ?? agendaItemTitles[item.type]
-      }) ?? []); 
     }
   }
 };
