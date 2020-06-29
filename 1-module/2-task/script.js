@@ -48,19 +48,44 @@ export const app = new Vue({
   el: '#app',
 
   data: {
-    //
+    meetupId: MEETUP_ID,
+    meetup: {}
   },
 
-  mounted() {
-    // Требуется получить данные митапа с API
+  async mounted() {
+    this.meetup = await this.fetchMeetupData()
   },
 
   computed: {
-    //
+    meetupCover() {
+      return this.meetup.imageId ? `${API_URL}/images/${this.meetup.imageId}` : undefined;
+    },
+    meetupDate() {
+      return new Date(this.meetup.date).toLocaleString(navigator.language, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })      
+    },
+    agendaList() {
+      return this.meetup.agenda?.map((item) => ({
+        ...item,
+        iconUrl: `/assets/icons/icon-${agendaItemIcons[item.type]}.svg`,
+        complexTitle: item.title ?? agendaItemTitles[item.type]
+      }) ?? []); 
+    }
   },
 
   methods: {
-    // Получение данных с API предпочтительнее оформить отдельным методом,
-    // а не писать прямо в mounted()
+    async fetchMeetupData(){
+      const response = await fetch(`${API_URL}/meetups/${this.meetupId}`);
+
+      if (response.ok) { // если HTTP-статус в диапазоне 200-299
+        // получаем тело ответа (см. про этот метод ниже)
+        return await response.json();
+      } else {
+        alert("Ошибка HTTP: " + response.status);
+      }
+    }
   },
 });
