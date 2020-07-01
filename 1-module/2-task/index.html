@@ -37,9 +37,9 @@
                 </div>
                 <div class="meetup-agenda__item-col">{{item.startsAt}} - {{item.endsAt}}</div>
                 <div class="meetup-agenda__item-col">
-                  <h5 class="meetup-agenda__title" v-html="item.complexTitle"></h5>
+                  <h5 class="meetup-agenda__title">{{ item.complexTitle }}</h5>
                   <p v-if="item.speaker"><span>{{item.speaker}}</span><span class="meetup-agenda__dot"></span><span class="meetup-agenda__lang">{{item.language}}</span></p>
-                  <p v-if="item.description" v-html="item.description"></p>
+                  <p v-if="item.description">{{ item.description }}</p>
                 </div>
               </div>
             </template>
