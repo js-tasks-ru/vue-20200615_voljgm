@@ -9,34 +9,83 @@ export const MeetupsCalendar = {
     <div class="rangepicker__calendar">
       <div class="rangepicker__month-indicator">
         <div class="rangepicker__selector-controls">
-          <button class="rangepicker__selector-control-left"></button>
-          <div>Июнь 2020</div>
-          <button class="rangepicker__selector-control-right"></button>
+          <button class="rangepicker__selector-control-left" @click="addMonth(-1)"></button>
+          <div>{{ currentMonth }}</div>
+          <button class="rangepicker__selector-control-right" @click="addMonth(1)"></button>
         </div>
       </div>
-      <div class="rangepicker__date-grid">
-        <div class="rangepicker__cell rangepicker__cell_inactive">28</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">29</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">30</div>
-        <div class="rangepicker__cell rangepicker__cell_inactive">31</div>
-        <div class="rangepicker__cell">
-          1
-          <a class="rangepicker__event">Митап</a>
-          <a class="rangepicker__event">Митап</a>
-        </div>
-        <div class="rangepicker__cell">2</div>
-        <div class="rangepicker__cell">3</div>
+      <div class="rangepicker__date-grid" v-for="week in weeks">
+        <div class="rangepicker__cell" 
+              v-for="day in week" :class="{ 'rangepicker__cell_inactive': !day.isCurrentMonth }">{{ day.day }}
+          <a class="rangepicker__event" v-for="meetup in day.meetups">{{ meetup.title }}</a>
+          </div>  
       </div>
     </div>
   </div>`,
 
-  // Пропсы
+  data: () => ({
+    showDateFrom: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+  }),
 
-  // В качестве локального состояния требуется хранить что-то,
-  // что позволит определить текущий показывающийся месяц.
-  // Изначально должен показываться текущий месяц
+  props: {
+    meetups: {
+      type: Array,
+      required: true
+    }
+  },
 
-  // Вычислимые свойства помогут как с получением списка дней, так и с выводом информации
+  computed: {
+    meetupDates() {
+      return [...this.meetups.map(i => ({
+        date: this.dateAsString(new Date(i.date)),
+        title: i.title
+      }))];
+    },
 
-  // Методы понадобятся для переключения между месяцами
+    weeks() {
+      const weekStart = this.showDateFrom.getDay() === 0 ? 7 : this.showDateFrom.getDay();
+      const currentMonth = this.showDateFrom.getMonth();
+      let currentDate = new Date(this.showDateFrom.getFullYear(), this.showDateFrom.getMonth(), 2 - weekStart);
+      let res = [];
+      let week = [];
+
+      const mm = this.meetupDates;
+
+      do {
+        for (let step = 0; step < 7; step++) {
+          const currentDateString = this.dateAsString(currentDate);
+          week.push({
+            day: currentDate.getDate(),
+            isCurrentMonth: currentDate.getMonth() === currentMonth,
+            meetups: [...this.meetupDates.filter(i => i.date === currentDateString)]
+          });
+          currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
+        }
+        res.push(week);
+        week = [];
+      } while (currentDate.getMonth() === currentMonth)
+
+      return res;
+    },
+
+    currentMonth() {
+      const month = this.firstLetterUpper(this.showDateFrom.toLocaleString(navigator.language, { month: 'long' }));
+      return `${month} ${this.showDateFrom.getFullYear()}`;
+    }
+  },
+
+  methods: {
+    firstLetterUpper(str) {
+      return str[0].toUpperCase() + str.slice(1);
+    },
+
+    dateAsString(date) {
+      return `${date.getFullYear()}|${date.getMonth()}|${date.getDate()}`;
+    },
+    
+    addMonth(cnt) {
+      this.showDateFrom = new Date(this.showDateFrom.getFullYear(), this.showDateFrom.getMonth() + cnt, 1);
+    }
+  },
+
 };
