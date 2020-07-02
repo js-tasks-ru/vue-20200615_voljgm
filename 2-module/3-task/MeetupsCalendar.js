@@ -14,11 +14,11 @@ export const MeetupsCalendar = {
           <button class="rangepicker__selector-control-right" @click="addMonth(1)"></button>
         </div>
       </div>
-      <div class="rangepicker__date-grid" v-for="week in weeks">
+      <div class="rangepicker__date-grid">
         <div class="rangepicker__cell" 
-              v-for="day in week" :class="{ 'rangepicker__cell_inactive': !day.isCurrentMonth }">{{ day.day }}
+              v-for="day in days" :class="{ 'rangepicker__cell_inactive': !day.isCurrentMonth }">{{ day.day }}
           <a class="rangepicker__event" v-for="meetup in day.meetups">{{ meetup.title }}</a>
-          </div>  
+        </div>  
       </div>
     </div>
   </div>`,
@@ -42,27 +42,22 @@ export const MeetupsCalendar = {
       }))];
     },
 
-    weeks() {
+    days() {
       const weekStart = this.showDateFrom.getDay() === 0 ? 7 : this.showDateFrom.getDay();
       const currentMonth = this.showDateFrom.getMonth();
       let currentDate = new Date(this.showDateFrom.getFullYear(), this.showDateFrom.getMonth(), 2 - weekStart);
       let res = [];
-      let week = [];
-
-      const mm = this.meetupDates;
 
       do {
         for (let step = 0; step < 7; step++) {
           const currentDateString = this.dateAsString(currentDate);
-          week.push({
+          res.push({
             day: currentDate.getDate(),
             isCurrentMonth: currentDate.getMonth() === currentMonth,
             meetups: [...this.meetupDates.filter(i => i.date === currentDateString)]
           });
           currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
         }
-        res.push(week);
-        week = [];
       } while (currentDate.getMonth() === currentMonth)
 
       return res;
