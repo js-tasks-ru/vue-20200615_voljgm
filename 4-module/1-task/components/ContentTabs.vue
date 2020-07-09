@@ -6,7 +6,7 @@
         :key="JSON.stringify(tab.to)">{{ tab.text }}</router-link>
     </div>
     <div class="content-tabs__content">
-      <router-view />
+      <slot />
     </div>
   </div>
 </template>
