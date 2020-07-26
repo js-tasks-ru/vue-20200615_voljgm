@@ -1,20 +1,15 @@
+<template>
+  <base-button class="button_secondary" v-bind="$attrs" v-on="$listeners">
+    <slot></slot>
+  </base-button>
+</template>
+
 <script>
 import BaseButton from './BaseButton.vue';
 export default {
   name: 'SecondaryButton',
-  extends: BaseButton,
-  components:  { BaseButton },
-  render: function (createElement) {
-    return createElement(
-      'base-button',   // имя тега
-      {
-        class: 'button_secondary',
-        props: this.$props,
-        on: this.$listeners,
-      },
-      this.$slots.default
-    )
-  }
+  inheritAttrs: false,
+  components:  { BaseButton }
 };
 </script>
 
