@@ -1,18 +1,76 @@
 <template>
-  <div
-    class="input-group input-group_icon input-group_icon-left input-group_icon-right"
-  >
-    <img class="icon" />
+  <div class="input-group" 
+    :class="{ 'input-group_icon' : hasLeftIcon || hasRightIcon, 'input-group_icon-left': hasLeftIcon, 'input-group_icon-right': hasRightIcon }">
+    <slot name="left-icon"></slot>
 
-    <input class="form-control form-control_rounded form-control_sm" />
+    <textarea v-if="multiline" class="form-control" 
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
+      v-bind="$attrs" v-model="nativeValue" 
+      @input="onChangeValue('input', $event.target.value)"
+      @change="onChangeValue('change', $event.target.value)">
+    </textarea>
 
-    <img class="icon" />
+    <input v-else class="form-control" 
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
+      v-bind="$attrs" v-model="nativeValue" 
+      @input="onChangeValue('input', $event.target.value)"
+      @change="onChangeValue('change', $event.target.value)" />
+
+    <slot name="right-icon"></slot>
   </div>
 </template>
 
 <script>
 export default {
   name: 'AppInput',
+  props: {
+    small: {
+      type: Boolean,
+      default: false
+    },
+    rounded: {
+      type: Boolean,
+      default: false
+    },
+    multiline: {
+      type: Boolean,
+      default: false
+    },
+    value: {
+
+    }
+  },
+  data() {
+    return {
+      nativeValue: this.value,
+    };
+  },
+  
+  watch: {
+    value: {
+      handler(newValue) {
+        if (this.nativeValue !== newValue) {
+          this.nativeValue = newValue;
+        }
+      },
+    },
+  },
+
+  computed: {
+    hasLeftIcon() {
+      return (this.$slots['left-icon']);
+    },
+    hasRightIcon() {
+      return (this.$slots['right-icon']);
+    }
+  },
+  methods: {
+    onChangeValue(type, value) {
+      this.$emit(type, value);
+      this.nativeValue = value;
+      this.$emit('update:value', value);
+    }
+  }
 };
 </script>
 
