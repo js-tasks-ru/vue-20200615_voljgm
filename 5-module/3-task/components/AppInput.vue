@@ -5,16 +5,12 @@
 
     <textarea v-if="multiline" class="form-control" 
       :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
-      v-bind="$attrs" v-model="nativeValue" 
-      @input="onChangeValue('input', $event.target.value)"
-      @change="onChangeValue('change', $event.target.value)">
+      v-bind="$attrs" v-model="nativeValue" v-on="inputListeners">
     </textarea>
 
     <input v-else class="form-control" 
       :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
-      v-bind="$attrs" v-model="nativeValue" 
-      @input="onChangeValue('input', $event.target.value)"
-      @change="onChangeValue('change', $event.target.value)" />
+      v-bind="$attrs" v-model="nativeValue" v-on="inputListeners" />
 
     <slot name="right-icon"></slot>
   </div>
@@ -23,6 +19,7 @@
 <script>
 export default {
   name: 'AppInput',
+  inheritAttrs: false,
   props: {
     small: {
       type: Boolean,
@@ -45,7 +42,12 @@ export default {
       nativeValue: this.value,
     };
   },
-  
+
+  model: {
+    prop: 'value',
+    event: 'change'
+  },  
+
   watch: {
     value: {
       handler(newValue) {
@@ -62,13 +64,22 @@ export default {
     },
     hasRightIcon() {
       return (this.$slots['right-icon']);
-    }
-  },
-  methods: {
-    onChangeValue(type, value) {
-      this.$emit(type, value);
-      this.nativeValue = value;
-      this.$emit('update:value', value);
+    },
+    inputListeners() {
+      const vm = this
+      return Object.assign({},
+        this.$listeners,
+        {
+          input: function (event) {
+            vm.$emit('input', event.target.value)
+          },
+          change: function (event) {
+            vm.$emit('change', event.target.value)
+            vm.nativeValue = event.target.value;
+            vm.$emit('update:value', event.target.value);
+          },
+        }
+      )
     }
   }
 };
