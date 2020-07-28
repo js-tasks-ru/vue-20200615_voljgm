@@ -1,10 +1,15 @@
 <template>
-  <button></button>
+  <base-button class="button_secondary" v-bind="$attrs" v-on="$listeners">
+    <slot></slot>
+  </base-button>
 </template>
 
 <script>
+import BaseButton from './BaseButton.vue';
 export default {
   name: 'SecondaryButton',
+  inheritAttrs: false,
+  components:  { BaseButton }
 };
 </script>
 

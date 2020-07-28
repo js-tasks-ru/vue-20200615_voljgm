@@ -1,11 +1,27 @@
 <template>
-  <button class="button">content</button>
+  <component class="button" :class="{ 'button_block' : block }" :is="tag" v-bind="$attrs" v-on="$listeners">
+    <slot></slot>
+  </component>
 </template>
 
 <script>
 export default {
-  name: 'BaseButton',
-};
+  name: 'BaseButton',  
+  
+  props: {
+    block: {
+      type: Boolean
+    },
+    tag: {
+      type: String,
+      default: "button",
+      validator: function (value) {
+        // Значение должно соответствовать одной из этих строк
+        return ['button', 'a', 'router-link'].indexOf(value.toLowerCase()) !== -1
+      }
+    },
+  },
+}; 
 </script>
 
 <style scoped>

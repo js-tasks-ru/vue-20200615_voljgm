@@ -1,18 +1,67 @@
 <template>
-  <div
-    class="input-group input-group_icon input-group_icon-left input-group_icon-right"
-  >
-    <img class="icon" />
+  <div class="input-group" 
+    :class="{ 'input-group_icon' : hasLeftIcon || hasRightIcon, 'input-group_icon-left': hasLeftIcon, 'input-group_icon-right': hasRightIcon }">
+    <slot name="left-icon"></slot>
 
-    <input class="form-control form-control_rounded form-control_sm" />
+    <textarea v-if="multiline" class="form-control" 
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
+      v-bind="$attrs" :value="value" v-on="inputListeners">
+    </textarea>
 
-    <img class="icon" />
+    <input v-else class="form-control" 
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }" 
+      v-bind="$attrs" :value="value" v-on="inputListeners" />
+
+    <slot name="right-icon"></slot>
   </div>
 </template>
 
 <script>
 export default {
   name: 'AppInput',
+  inheritAttrs: false,
+  props: {
+    small: {
+      type: Boolean,
+      default: false
+    },
+    rounded: {
+      type: Boolean,
+      default: false
+    },
+    multiline: {
+      type: Boolean,
+      default: false
+    },
+    value: {
+
+    }
+  },
+  model: {
+    prop: 'value',
+    event: 'change'
+  },  
+
+  computed: {
+    hasLeftIcon() {
+      return (this.$slots['left-icon']);
+    },
+    hasRightIcon() {
+      return (this.$slots['right-icon']);
+    },
+    inputListeners() {
+      return {
+        ...this.$listeners,
+        input: (event) => {
+          this.$emit('input', event.target.value)
+        },
+        change: (event) => {
+          this.$emit('change', event.target.value)
+          this.$emit('update:value', event.target.value);
+        },
+      }
+    }
+  }
 };
 </script>
 
